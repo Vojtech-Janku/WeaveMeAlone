@@ -16,3 +16,5 @@ TUTORIALS, GUIDES, PDFs
 
 PAID WEBSITES
 - https://e-weave-online.thinkific.com/
+
+Update: I will try to create the algorithm myself and vibecode all the infrastructure around it. I already tried Lovable, will probably try Cursor for this.
