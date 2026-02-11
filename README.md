@@ -22,6 +22,7 @@ TUTORIALS, GUIDES, PDFs
 
 PAID WEBSITES
 - https://e-weave-online.thinkific.com/
+    - links to http://www.fiberworks-pcw.com/download.htm, which is free
 
 DRAFT DESIGNER
 - https://jamespbarrett.github.io/tabletweave/
