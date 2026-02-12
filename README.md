@@ -34,3 +34,5 @@ Note: Perplexity said that there isn't any such app/website yet, just the ones i
 After some research, I found that you can make all kinds of letters and shapes from two colors - just select the warping for all tablets as black, black, white, white, and then in each step for each tablet you can decide to either stay on the same color or change it. 
 So that is probably one major reason for the absence of "reverse engineering algorithm". Still, it's surprising, because a lot of IT/engineering people do this hobby so this shouldn't be an original idea at this point. I think if I'll keep searching, I'll probably find some obscure site that does just that.
 Also if I actually make this, I should emphasize that it's just a tool and not a panacea, it doesn't make creating your own patterns obsolete and especially not less fun.
+
+Note: Actually useful idea - combine the previous app with computer vision (edge detection) to get the threading and algorithm from a photo. I think some people would actually be happy to use that.
