@@ -1,9 +1,17 @@
 
+import java.util.List;
+
 public class Weaver {
-    int patWidth;
-    int patLength;
-    int[][] pattern;
+    List<Tablet> tablets;
 
     
+
+    public Weaver(List<Tablet> tablets) {
+        this.tablets = tablets;
+    }
+    
+    public int getTabletNumber() {
+        return tablets.size();
+    }
 }
 
