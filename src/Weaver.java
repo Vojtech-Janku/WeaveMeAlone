@@ -1,8 +1,9 @@
 
 import java.util.List;
 
+
 public class Weaver {
-    List<Tablet> tablets;
+    public final List<Tablet> tablets;
 
     
 
@@ -12,6 +13,16 @@ public class Weaver {
     
     public int getTabletNumber() {
         return tablets.size();
+    }
+
+    public void getWarpDesign()
+    {
+
+    }
+
+    public void getSteps()
+    {
+        
     }
 }
 

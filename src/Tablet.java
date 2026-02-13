@@ -1,7 +1,11 @@
 public class Tablet {
-    int numThreads;
+    public final int[] threadColors;
 
-     public Tablet(int numThreads) {
-        this.numThreads = numThreads;
+    public Tablet(int[] threadColors) {
+        this.threadColors = threadColors;
+    }
+
+    public int getThreadCount() {
+        return threadColors.length;
     }
 }
