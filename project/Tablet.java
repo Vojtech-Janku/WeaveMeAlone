@@ -1,12 +1,15 @@
 package project;
-public class Tablet {
-    public final int[] threadColors;
 
-    public Tablet(int[] threadColors) {
+import java.util.List;
+
+public class Tablet {
+    public final List<String> threadColors;
+
+    public Tablet(List<String> threadColors) {
         this.threadColors = threadColors;
     }
 
     public int getThreadCount() {
-        return threadColors.length;
+        return threadColors.size();
     }
 }

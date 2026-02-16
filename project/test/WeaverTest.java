@@ -1,4 +1,5 @@
 package project.test;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -13,13 +14,13 @@ public class WeaverTest {
     @Before
     public static void setUp()
     {
-        weaver = new Weaver();
+        Weaver weaver = new Weaver();
     }
 
 
     @Test 
     public static void fourTabletsTest() {
-        tablet1 Tablet = new Tablet({1,1,1,1});
-        Weaver weaver = new Weaver(List.of( tablet1 ));
+        Tablet tablet1 = new Tablet(Arrays.asList("red", "red", "red", "white"));
+        Weaver weaver = new Weaver(Arrays.asList( tablet1 ));
     }
 }
