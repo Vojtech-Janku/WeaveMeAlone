@@ -228,6 +228,9 @@ function renderPalette() {
 //  for any 2-colour column pattern.
 // ═══════════════════════════════════════════════════════════════════
 
+// TODO: set the direction based on the difference with neighboring columns
+//    (move together as many tablets as possible)
+//        also set it based on overall torque - all of them can't be Z or S
 function analyzeTablet(colColors, dir) {
   // colColors: array of colorIndex per pick (0 = empty)
   // dir: 'Z' or 'S'
