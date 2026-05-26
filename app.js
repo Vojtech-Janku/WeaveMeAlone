@@ -63,7 +63,7 @@ function drawGrid() {
   for (let r = 0; r < numPicks; r++) {
     for (let c = 0; c < numTablets; c++) {
       const ci = grid[r][c];
-      ctx.fillStyle = (ci > 0 && palette[ci - 1]) ? palette[ci - 1].hex : '#1a1a1e';
+      ctx.fillStyle = (ci > 0 && palette[ci - 1]) ? palette[ci - 1].hex : (palette[1]?.hex ?? palette[0]?.hex);
       ctx.fillRect(c * (cs + GAP) + GAP, r * (cs + GAP) + GAP, cs, cs);
     }
   }
@@ -97,7 +97,7 @@ function paint(cell, colorIdx) {
   if (grid[cell.row][cell.col] === colorIdx) return;
   grid[cell.row][cell.col] = colorIdx;
   const cs = cellSize;
-  ctx.fillStyle = (colorIdx > 0 && palette[colorIdx - 1]) ? palette[colorIdx - 1].hex : '#1a1a1e';
+  ctx.fillStyle = (colorIdx > 0 && palette[colorIdx - 1]) ? palette[colorIdx - 1].hex : (palette[1]?.hex ?? palette[0]?.hex);
   ctx.fillRect(cell.col * (cs + GAP) + GAP, cell.row * (cs + GAP) + GAP, cs, cs);
 }
 
@@ -155,7 +155,7 @@ function renderPalette() {
   eraser.className = 'swatch eraser' + (activeColor === 0 ? ' active' : '');
   eraser.title = 'Eraser (right-click also erases)';
   eraser.textContent = '✕';
-  eraser.onclick = () => { activeColor = 0; renderPalette(); };
+  eraser.addEventListener('click', () => { activeColor = 0; renderPalette(); });
   el.appendChild(eraser);
 
   // Colour swatches
@@ -175,13 +175,13 @@ function renderPalette() {
 
     // Single click = select; double-click = open colour picker
     let clickTimer = null;
-    sw.onclick = () => {
+    sw.addEventListener('click', () => {
       if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; inp.click(); }
       else {
         activeColor = i + 1; renderPalette();
         clickTimer = setTimeout(() => { clickTimer = null; }, 280);
       }
-    };
+    });
     sw.appendChild(inp);
     el.appendChild(sw);
   });
@@ -192,11 +192,11 @@ function renderPalette() {
     add.className = 'add-swatch';
     add.title = 'Add colour';
     add.textContent = '+';
-    add.onclick = () => {
+    add.addEventListener('click', () => {
       palette.push({ hex: '#888888', name: `Color ${palette.length + 1}` });
       activeColor = palette.length;
       renderPalette();
-    };
+    });
     el.appendChild(add);
   }
 }
@@ -261,7 +261,7 @@ function analyzeTablet(colColors, dir) {
 
   const turns = [];
   for (let i = 1; i < colColors.length; i++) {
-    const target = colColors[i] !== 0 ? colColors[i] : face(fwd(pos)); // empty → keep going forward
+    const target = colColors[i];
     const posF = fwd(pos);
     if (face(posF) === target) {
       turns.push('F'); pos = posF;
@@ -280,16 +280,25 @@ function analyzeTablet(colColors, dir) {
 function generate() {
   const warnings = [];
   const results  = [];
+  const bgColor  = palette.length >= 2 ? 2 : 1; // empty cells = Natural (color 2)
 
   for (let c = 0; c < numTablets; c++) {
     const dir       = c % 2 === 0 ? 'Z' : 'S'; // alternate for balanced twist
-    const colColors = grid.map(row => row[c]);
+    const colColors = grid.map(row => row[c] === 0 ? bgColor : row[c]);
     const r         = analyzeTablet(colColors, dir);
     results.push(r);
     if (r.warning) warnings.push(`Tablet ${c + 1}: ${r.warning}`);
   }
 
   renderResults(results, warnings);
+}
+
+function textColor(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128
+    ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)';
 }
 
 function dot(ci, size) {
@@ -367,13 +376,6 @@ function renderResults(results, warnings) {
     const r  = results[c];
     const c1 = (r.color1 && palette[r.color1 - 1]) ? palette[r.color1 - 1].hex : '#333';
     const c2 = (r.color2 && palette[r.color2 - 1]) ? palette[r.color2 - 1].hex : '#222';
-    const textColor = hex => {
-      const r2 = parseInt(hex.slice(1, 3), 16);
-      const g2 = parseInt(hex.slice(3, 5), 16);
-      const b2 = parseInt(hex.slice(5, 7), 16);
-      return (r2 * 299 + g2 * 587 + b2 * 114) / 1000 > 128
-        ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)';
-    };
     const t1 = textColor(c1), t2 = textColor(c2);
     h += `
     <div class="tablet-card">
@@ -472,6 +474,11 @@ function loadExample() {
 // ═══════════════════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════════════════
+
+document.getElementById('btn-generate').addEventListener('click', generate);
+document.getElementById('btn-example').addEventListener('click', loadExample);
+document.getElementById('btn-clear').addEventListener('click', clearGrid);
+document.getElementById('btn-resize').addEventListener('click', resizeGrid);
 
 initGrid(numTablets, numPicks);
 renderPalette();

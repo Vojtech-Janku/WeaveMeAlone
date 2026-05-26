@@ -19,6 +19,7 @@ TUTORIALS, GUIDES, PDFs
 - https://www2.cs.arizona.edu/patterns/weaving/webdocs/gre_fa.pdf
 - https://www2.cs.arizona.edu/patterns/weaving/webdocs/mo/D/FabricAnalysis.pdf
 - http://ladyelewys.carpevinumpdx.com/2020/08/27/tablet-weaving-for-the-absolute-beginner-birka-6/ - best place to start, birka pattern with zero twist
+- https://www.stringpage.com/tw/twtheory.html - actually this might be the best place to start, very brief yet informative and owell organized
 
 PAID WEBSITES
 - https://e-weave-online.thinkific.com/
