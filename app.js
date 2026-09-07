@@ -14,6 +14,18 @@ let lastCell    = null;
 let palette = [
   { hex: '#18181a', name: 'Black'   },
   { hex: '#f0ece0', name: 'Natural' },
+  { hex: '#ddcda8', name: 'Undyed Wool' },
+  { hex: '#3c5a72', name: 'Woad Blue' },
+  { hex: '#9c3b2c', name: 'Madder Red' },
+  { hex: '#c8a233', name: 'Weld Yellow' },
+  { hex: '#6b4a34', name: 'Walnut Brown' },
+  { hex: '#26374d', name: 'Deep Indigo' },
+  { hex: '#bb7a2e', name: 'Saffron Ochre' },
+  { hex: '#2b2622', name: 'Iron-Gall Black' },
+  { hex: '#566b3a', name: 'Woad-Weld Green' },
+  { hex: '#6a4258', name: 'Orchil Purple' },
+  { hex: '#514d47', name: 'Charcoal Grey' },
+  { hex: '#b06a5a', name: 'Madder Rose' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════
