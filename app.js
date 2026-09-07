@@ -247,23 +247,31 @@ function analyzeTablet(colColors, dir) {
   // colColors: array of colorIndex per pick (0 = empty)
   // dir: 'Z' or 'S'
 
+  // TODO: color = 0 artifact of 2 colors?
   const nonEmpty = colColors.filter(c => c !== 0);
+  let threading = [ 0, 0, 0, 0 ];
   if (nonEmpty.length === 0) {
-    return { color1: 0, color2: 0, dir, initialPos: 0,
+    return { threading, dir, initialPos: 0,
              turns: new Array(colColors.length - 1).fill('F'), warning: null };
   }
 
   const unique = [...new Set(nonEmpty)];
   let warning = null;
-  if (unique.length > 2) {
-    warning = `${unique.length} colors — only the first 2 will be used`;
+  if (unique.length == 1) {
+    return { threading: new Array(4).fill(unique.at(0)), dir, initialPos: 0,
+             turns: new Array(colColors.length - 1).fill('F'), warning: null };
   }
+  if (unique.length > 4) {
+    warning = `${unique.length} colors — only the first 4 will be used`;
+  }
+  // now we know we have 2-4 unique colors
 
+  
   const color1 = unique[0];
   const color2 = unique.length > 1 ? unique[1] : unique[0];
 
   // pos → face color
-  const face = p => (p <= 1) ? color1 : color2;
+  const face = p => threading[p];
 
   // Turn effects based on threading direction
   const fwd = p => dir === 'Z' ? (p + 1) % 4 : (p + 3) % 4;
