@@ -299,8 +299,8 @@ function analyzeTablet(colColors, dir) {
 
   let turns = [];
 
-  const res = solveThreading(1, 0)
-  if(!res) {
+  const solved = solveThreading(1, 0)
+  if(!solved) {
     warning = `no solution found for this tablet`;
   }
   
