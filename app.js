@@ -384,7 +384,7 @@ function renderResults(results, warnings) {
   ['A', 'B', 'C', 'D'].forEach((hole, hi) => {
     h += `<tr><th class="row-head">${hole}</th>`;
     for (let c = 0; c < numTablets; c++) {
-      const ci = hi <= 1 ? results[c].color1 : results[c].color2;
+      const ci = results[c].threading[hi];
       h += `<td>${dot(ci, 16)}</td>`;
     }
     h += '</tr>';
@@ -409,21 +409,19 @@ function renderResults(results, warnings) {
   const show = Math.min(numTablets, 16);
   h += '<div class="tablet-diagrams">';
   for (let c = 0; c < show; c++) {
-    const r  = results[c];
-    const c1 = (r.color1 && palette[r.color1 - 1]) ? palette[r.color1 - 1].hex : '#333';
-    const c2 = (r.color2 && palette[r.color2 - 1]) ? palette[r.color2 - 1].hex : '#222';
-    const t1 = textColor(c1), t2 = textColor(c2);
+    const r = results[c];
+    const cols = r.threading.map(ci => (ci && palette[ci - 1]) ? palette[ci - 1].hex : '#333');
+    const txt  = cols.map(textColor);
     h += `
     <div class="tablet-card">
       <div class="tnum">T${c + 1}</div>
       <div class="tablet-holes">
-        <div class="hole" style="background:${c1};color:${t1}">A</div>
-        <div class="hole" style="background:${c1};color:${t1}">B</div>
-        <div class="hole" style="background:${c2};color:${t2}">D</div>
-        <div class="hole" style="background:${c2};color:${t2}">C</div>
+        <div class="hole" style="background:${cols[0]};color:${txt[0]}">A</div>
+        <div class="hole" style="background:${cols[1]};color:${txt[1]}">B</div>
+        <div class="hole" style="background:${cols[3]};color:${txt[3]}">D</div>
+        <div class="hole" style="background:${cols[2]};color:${txt[2]}">C</div>
       </div>
       <div class="dir-tag">${r.dir === 'Z' ? '⟍' : '⟋'} ${r.dir}</div>
-      <div class="start-tag">↑${holeName(r.initialPos)}</div>
     </div>`;
   }
   if (numTablets > 16) {
