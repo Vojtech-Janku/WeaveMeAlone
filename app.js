@@ -276,39 +276,25 @@ function analyzeTablet(colColors, dir) {
 
   let repeating = true; // TODO: make this a param
 
-  function solveThreading(idx, pos) {
-    if (idx == colColors.length && (!repeating || pos == 0) ) return true; //TODO: add loop condition
-
-    const target = colColors[idx];
-    const posF = fwd(pos);
-    const colF = threading[posF]
-    if (colF == 0) {
-      threading[posF] = target;
+  function tryTurn(label, idx, newPos) {
+    const prevCol = threading[newPos]
+    if (prevCol == 0) {
+      threading[newPos] = colColors[idx];
     }
-    if ( threading[posF] == target ) {
-      turns.push('F');
-      if (solveThreading(idx+1, posF)) {
+    if ( threading[newPos] == colColors[idx] ) {
+      turns.push(label);
+      if (solveThreading(idx+1, newPos)) {
         return true;
-      } else {
-        threading[posF] = colF;
-        turns.pop();
       }
-    }
-    const posB = bwd(pos);
-    const colB = threading[posB]
-    if (colB == 0) {
-      threading[posB] = target;
-    }
-    if ( threading[posB] == target ) {
-      turns.push('B');
-      if (solveThreading(idx+1, posB)) {
-        return true;
-      } else {
-        threading[posB] = colB;
-        turns.pop();
-      }
+      threading[newPos] = prevCol;
+      turns.pop();
     }
     return false;
+  }
+
+  function solveThreading(idx, pos) {
+    if (idx == colColors.length && (!repeating || pos == 0) ) return true; //TODO: add loop condition
+    return tryTurn('F', idx, fwd(pos)) || tryTurn('B', idx, bwd(pos));
   }
 
   let turns = [];
@@ -318,8 +304,6 @@ function analyzeTablet(colColors, dir) {
     warning = `no solution found for this tablet`;
   }
   
-
-
   return { threading, dir, turns, warning };
 }
 
