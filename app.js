@@ -251,24 +251,21 @@ function analyzeTablet(colColors, dir) {
   const nonEmpty = colColors.filter(c => c !== 0);
   let threading = [ 0, 0, 0, 0 ];
   if (nonEmpty.length === 0) {
-    return { threading, dir, initialPos: 0,
+    return { threading, dir,
              turns: new Array(colColors.length - 1).fill('F'), warning: null };
   }
 
   const unique = [...new Set(nonEmpty)];
   let warning = null;
   if (unique.length == 1) {
-    return { threading: new Array(4).fill(unique.at(0)), dir, initialPos: 0,
+    return { threading: new Array(4).fill(colColors[0]), dir,
              turns: new Array(colColors.length - 1).fill('F'), warning: null };
   }
   if (unique.length > 4) {
-    warning = `${unique.length} colors — only the first 4 will be used`;
+    warning = `${unique.length} colors — a 4-hole tablet can't display more than 4"`;
   }
   // now we know we have 2-4 unique colors
-
-  
-  const color1 = unique[0];
-  const color2 = unique.length > 1 ? unique[1] : unique[0];
+  threading[0] = colColors[0];
 
   // pos → face color
   const face = p => threading[p];
@@ -277,24 +274,56 @@ function analyzeTablet(colColors, dir) {
   const fwd = p => dir === 'Z' ? (p + 1) % 4 : (p + 3) % 4;
   const bwd = p => dir === 'Z' ? (p + 3) % 4 : (p + 1) % 4;
 
-  // Initial position: 0 (hole A up → color1) or 2 (hole C up → color2)
-  const firstColor = colColors.find(c => c !== 0) ?? color1;
-  let pos = (firstColor === color1) ? 0 : 2;
-  const initialPos = pos;
+  let repeating = true; // TODO: make this a param
 
-  const turns = [];
-  for (let i = 1; i < colColors.length; i++) {
-    const target = colColors[i];
+  function solveThreading(idx, pos) {
+    if (idx == colColors.length && (!repeating || pos == 0) ) return true; //TODO: add loop condition
+
+    const target = colColors[idx];
     const posF = fwd(pos);
-    if (face(posF) === target) {
-      turns.push('F'); pos = posF;
-    } else {
-      turns.push('B'); pos = bwd(pos);
+    const colF = threading[posF]
+    if (colF == 0) {
+      threading[posF] = target;
     }
+    if ( threading[posF] == target ) {
+      turns.push('F');
+      if (solveThreading(idx+1, posF)) {
+        return true;
+      } else {
+        threading[posF] = colF;
+        turns.pop();
+      }
+    }
+    const posB = bwd(pos);
+    const colB = threading[posB]
+    if (colB == 0) {
+      threading[posB] = target;
+    }
+    if ( threading[posB] == target ) {
+      turns.push('B');
+      if (solveThreading(idx+1, posB)) {
+        return true;
+      } else {
+        threading[posB] = colB;
+        turns.pop();
+      }
+    }
+    return false;
   }
 
-  return { color1, color2, dir, initialPos, turns, warning };
+  let turns = [];
+
+  const res = solveThreading(1, 0)
+  if(!res) {
+    warning = `no solution found for this tablet`;
+  }
+  
+
+
+  return { threading, dir, turns, warning };
 }
+
+
 
 // ═══════════════════════════════════════════════════════════════════
 //  GENERATE & RENDER RESULTS
