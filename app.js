@@ -272,25 +272,25 @@ function analyzeTablet(colColors) {
 
   let repeating = true; // TODO: make this a param
 
-  function tryTurn(label, idx, newPos) {
-    const prevCol = threading[newPos]
+  function tryTurn(label, idx, pos) {
+    const newPos    = label === 'F' ? fwd(pos) : bwd(pos);
+    const lookupPos = label === 'F' ? pos      : fwd(pos);
+    const prevCol = threading[lookupPos];
     if (prevCol == 0) {
-      threading[newPos] = colColors[idx];
+      threading[lookupPos] = colColors[idx];
     }
-    if ( threading[newPos] == colColors[idx] ) {
+    if (threading[lookupPos] == colColors[idx]) {
       turns.push(label);
-      if (solveThreading(idx+1, newPos)) {
-        return true;
-      }
-      threading[newPos] = prevCol;
+      if (solveThreading(idx + 1, newPos)) return true;
+      threading[lookupPos] = prevCol;
       turns.pop();
     }
     return false;
   }
 
   function solveThreading(idx, pos) {
-    if (idx == colColors.length && (!repeating || pos == 0) ) return true; //TODO: add loop condition
-    return tryTurn('F', idx, fwd(pos)) || tryTurn('B', idx, bwd(pos));
+    if (idx == colColors.length && (!repeating || pos == 0)) return true;
+    return tryTurn('F', idx, pos) || tryTurn('B', idx, pos);
   }
 
   const solved = solveThreading(1, 1)
