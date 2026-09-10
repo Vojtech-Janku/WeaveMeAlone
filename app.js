@@ -240,9 +240,6 @@ function renderPalette() {
 //  for any 2-colour column pattern.
 // ═══════════════════════════════════════════════════════════════════
 
-// TODO: set the direction based on the difference with neighboring columns
-//    (move together as many tablets as possible)
-//        also set it based on overall torque - all of them can't be Z or S
 function analyzeTablet(colColors) {
   // colColors: array of colorIndex per pick (0 = empty)
 
@@ -304,6 +301,28 @@ function analyzeTablet(colColors) {
   return { colColors: colColors, threading: threading, turns: turns, dir: 'Z', warning: warning };
 }
 
+function flipTablet(result) {
+  result.dir = result.dir === 'Z' ? 'S' : 'Z';
+  result.threading.reverse();
+  let flip = turn => turn==='F' ? 'B' : 'F';
+  for (let index = 0; index < result.turns.length; index++) {
+    result.turns[index] = flip(result.turns[index])
+  }
+}
+
+function optimizeResults(results) {
+  const numPicks = results[0].turns.length;
+  for (let index = 1; index < results.length; index++) {
+    let matchCount = 0;
+    for (let j = 0; j < numPicks; j++) {
+      matchCount += results[index].turns[j] === results[index-1].turns[j];
+    }
+    if( matchCount > numPicks/2 ) {
+      flipTablet(results[index]);
+    }
+  }
+  //TODO: //  also set directions based on overall torque - all of them can't be Z or S
+}
 
 // ═══════════════════════════════════════════════════════════════════
 //  GENERATE & RENDER RESULTS
@@ -320,6 +339,7 @@ function generate() {
     results.push(r);
     if (r.warning) warnings.push(`Tablet ${c + 1}: ${r.warning}`);
   }
+  optimizeResults(results);
 
   renderResults(results, warnings);
 }
