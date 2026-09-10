@@ -317,7 +317,7 @@ function optimizeResults(results) {
     for (let j = 0; j < numPicks; j++) {
       matchCount += results[index].turns[j] === results[index-1].turns[j];
     }
-    if( matchCount > numPicks/2 ) {
+    if( matchCount < numPicks/2 ) {
       flipTablet(results[index]);
     }
   }
