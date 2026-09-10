@@ -243,36 +243,35 @@ function renderPalette() {
 // TODO: set the direction based on the difference with neighboring columns
 //    (move together as many tablets as possible)
 //        also set it based on overall torque - all of them can't be Z or S
-function analyzeTablet(colColors, dir) {
+function analyzeTablet(colColors) {
   // colColors: array of colorIndex per pick (0 = empty)
-  // dir: 'Z' or 'S'
 
   // TODO: color = 0 artifact of 2 colors?
   const nonEmpty = colColors.filter(c => c !== 0);
   let threading = [ 0, 0, 0, 0 ];
   if (nonEmpty.length === 0) {
-    return { threading, dir,
-             turns: new Array(colColors.length - 1).fill('F'), warning: null };
+    return { colColors: colColors, threading: threading, turns: new Array(colColors.length).fill('F'), dir: 'Z', warning: null };
   }
 
   const unique = [...new Set(nonEmpty)];
   let warning = null;
   if (unique.length == 1) {
-    return { threading: new Array(4).fill(colColors[0]), dir,
-             turns: new Array(colColors.length - 1).fill('F'), warning: null };
+    return { colColors: colColors, threading: new Array(4).fill(colColors[0]),
+             turns: new Array(colColors.length).fill('F'), dir: 'Z', warning: null };
   }
   if (unique.length > 4) {
     warning = `${unique.length} colors — a 4-hole tablet can't display more than 4"`;
   }
   // now we know we have 2-4 unique colors
   threading[0] = colColors[0];
+  let turns = ['F'];
 
   // pos → face color
   const face = p => threading[p];
 
   // Turn effects based on threading direction
-  const fwd = p => dir === 'Z' ? (p + 1) % 4 : (p + 3) % 4;
-  const bwd = p => dir === 'Z' ? (p + 3) % 4 : (p + 1) % 4;
+  const fwd = p => (p + 1) % 4;
+  const bwd = p => (p + 3) % 4;
 
   let repeating = true; // TODO: make this a param
 
@@ -297,16 +296,13 @@ function analyzeTablet(colColors, dir) {
     return tryTurn('F', idx, fwd(pos)) || tryTurn('B', idx, bwd(pos));
   }
 
-  let turns = [];
-
   const solved = solveThreading(1, 0)
   if(!solved) {
     warning = `no solution found for this tablet`;
   }
   
-  return { threading, dir, turns, warning };
+  return { colColors: colColors, threading: threading, turns: turns, dir: 'Z', warning: warning };
 }
-
 
 
 // ═══════════════════════════════════════════════════════════════════
@@ -319,7 +315,6 @@ function generate() {
   const bgColor  = palette.length >= 2 ? 2 : 1; // empty cells = Natural (color 2)
 
   for (let c = 0; c < numTablets; c++) {
-    const dir       = c % 2 === 0 ? 'Z' : 'S'; // alternate for balanced twist
     const colColors = grid.map(row => row[c] === 0 ? bgColor : row[c]);
     const r         = analyzeTablet(colColors, dir);
     results.push(r);
