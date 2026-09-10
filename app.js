@@ -293,7 +293,7 @@ function analyzeTablet(colColors) {
     return tryTurn('F', idx, fwd(pos)) || tryTurn('B', idx, bwd(pos));
   }
 
-  const solved = solveThreading(1, 0)
+  const solved = solveThreading(1, 1)
   if(!solved) {
     warning = `no solution found for this tablet`;
   }
