@@ -58,36 +58,45 @@ function clearGrid() {
 
 const canvas = document.getElementById('grid-canvas');
 const ctx    = canvas.getContext('2d');
-const GAP    = 1; // grid line width in px
+const GAP    = 1;  // grid line width in px
+const LX     = 22; // left margin reserved for tablet-number labels
+const LY     = 14; // top margin reserved for pick-number labels
 
+// grid[row][col] = grid[pick][tablet]; on screen picks run left→right (x), tablets run top→down (y)
 function drawGrid() {
   const cs = cellSize;
-  const W  = numTablets * (cs + GAP) + GAP;
-  const H  = numPicks   * (cs + GAP) + GAP;
+  const W  = LX + numPicks   * (cs + GAP) + GAP;
+  const H  = LY + numTablets * (cs + GAP) + GAP;
   canvas.width  = W;
   canvas.height = H;
 
   // Background acts as grid lines
   ctx.fillStyle = '#333340';
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(LX, LY, W - LX, H - LY);
 
   // Cells
-  for (let r = 0; r < numPicks; r++) {
-    for (let c = 0; c < numTablets; c++) {
-      const ci = grid[r][c];
+  for (let p = 0; p < numPicks; p++) {
+    for (let t = 0; t < numTablets; t++) {
+      const ci = grid[p][t];
       ctx.fillStyle = (ci > 0 && palette[ci - 1]) ? palette[ci - 1].hex : (palette[1]?.hex ?? palette[0]?.hex);
-      ctx.fillRect(c * (cs + GAP) + GAP, r * (cs + GAP) + GAP, cs, cs);
+      ctx.fillRect(LX + p * (cs + GAP) + GAP, LY + t * (cs + GAP) + GAP, cs, cs);
     }
   }
 
-  // Tablet number labels at top (only when cells are large enough to read)
+  // Pick numbers along the top, tablet numbers along the left (only when legible)
   if (cs >= 16) {
     ctx.fillStyle = '#555566';
     ctx.font = `${Math.min(cs * 0.45, 10)}px monospace`;
     ctx.textAlign = 'center';
-    for (let c = 0; c < numTablets; c++) {
-      ctx.fillText(c + 1, c * (cs + GAP) + GAP + cs / 2, -2);
+    for (let p = 0; p < numPicks; p++) {
+      ctx.fillText(p + 1, LX + p * (cs + GAP) + GAP + cs / 2, LY - 3);
     }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let t = 0; t < numTablets; t++) {
+      ctx.fillText(t + 1, LX - 4, LY + t * (cs + GAP) + GAP + cs / 2);
+    }
+    ctx.textBaseline = 'alphabetic';
   }
 }
 
@@ -95,12 +104,12 @@ function cellAt(e) {
   const rect   = canvas.getBoundingClientRect();
   const scaleX = canvas.width  / rect.width;
   const scaleY = canvas.height / rect.height;
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top)  * scaleY;
-  const cs  = cellSize + GAP;
-  const col = Math.floor(x / cs);
-  const row = Math.floor(y / cs);
-  if (col >= 0 && col < numTablets && row >= 0 && row < numPicks) return { row, col };
+  const x = (e.clientX - rect.left) * scaleX - LX;
+  const y = (e.clientY - rect.top)  * scaleY - LY;
+  const cs    = cellSize + GAP;
+  const pick   = Math.floor(x / cs);
+  const tablet = Math.floor(y / cs);
+  if (pick >= 0 && pick < numPicks && tablet >= 0 && tablet < numTablets) return { row: pick, col: tablet };
   return null;
 }
 
@@ -110,7 +119,7 @@ function paint(cell, colorIdx) {
   grid[cell.row][cell.col] = colorIdx;
   const cs = cellSize;
   ctx.fillStyle = (colorIdx > 0 && palette[colorIdx - 1]) ? palette[colorIdx - 1].hex : (palette[1]?.hex ?? palette[0]?.hex);
-  ctx.fillRect(cell.col * (cs + GAP) + GAP, cell.row * (cs + GAP) + GAP, cs, cs);
+  ctx.fillRect(LX + cell.row * (cs + GAP) + GAP, LY + cell.col * (cs + GAP) + GAP, cs, cs);
 }
 
 canvas.addEventListener('mousedown', e => {
@@ -270,7 +279,7 @@ function analyzeTablet(colColors) {
   const fwd = p => (p + 1) % 4;
   const bwd = p => (p + 3) % 4;
 
-  let repeating = true; // TODO: make this a param
+  let repeating = false; // TODO: make this a param
 
   function tryTurn(label, idx, pos) {
     const newPos    = label === 'F' ? fwd(pos) : bwd(pos);
@@ -454,8 +463,9 @@ function renderResults(results, warnings) {
   for (let c = 0; c < numTablets; c++) h += `<th>T${c + 1}</th>`;
   h += '</tr>';
 
-  // Every pick has a real turn (including pick 1 — a color only becomes visible after turning)
-  for (let r = 0; r < numPicks; r++) {
+  // Every pick has a real turn (including pick 1 — a color only becomes visible after turning).
+  // Rows run pick N at top down to pick 1 at bottom, matching how the band grows upward as you weave.
+  for (let r = numPicks - 1; r >= 0; r--) {
     h += `<tr><td class="pick-num">${r + 1}</td>`;
     for (let c = 0; c < numTablets; c++) {
       const turn = results[c].turns[r] ?? '—';
