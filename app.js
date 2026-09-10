@@ -454,14 +454,9 @@ function renderResults(results, warnings) {
   for (let c = 0; c < numTablets; c++) h += `<th>T${c + 1}</th>`;
   h += '</tr>';
 
-  // Pick 1: no turn — tablets are at their initial position
-  h += `<tr><td class="pick-num">1 ★</td>`;
-  for (let c = 0; c < numTablets; c++) h += `<td style="color:var(--dim)">—</td>`;
-  h += '</tr>';
-
-  // Picks 2..N: turn applied after the previous pick
-  for (let r = 0; r < numPicks - 1; r++) {
-    h += `<tr><td class="pick-num">${r + 2}</td>`;
+  // Every pick has a real turn (including pick 1 — a color only becomes visible after turning)
+  for (let r = 0; r < numPicks; r++) {
+    h += `<tr><td class="pick-num">${r + 1}</td>`;
     for (let c = 0; c < numTablets; c++) {
       const turn = results[c].turns[r] ?? '—';
       const cls  = turn === 'F' ? 'turn-F' : (turn === 'B' ? 'turn-B' : '');
@@ -473,8 +468,8 @@ function renderResults(results, warnings) {
   h += '</table></div>';
 
   h += `<div class="note-box">
-    <strong>★ Pick 1</strong>: Thread tablets and set each starting hole (see Setup table) before weaving.<br>
-    <strong>Pick 2 onwards</strong>: After weaving each pick, turn every tablet F or B as shown in the next row, then weave.<br>
+    <strong>Before pick 1</strong>: Thread each tablet into its holes as shown in the Setup table above.<br>
+    <strong>Every pick</strong>: Turn each tablet F or B as shown, then weave.<br>
     <strong>Twist note</strong>: Alternating ⟍Z / ⟋S threading on adjacent tablets keeps the band flat.
     Long runs of only F or only B build twist — reverse direction periodically to release it.
   </div>`;
