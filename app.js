@@ -335,7 +335,7 @@ function generate() {
 
   for (let c = 0; c < numTablets; c++) {
     const colColors = grid.map(row => row[c] === 0 ? bgColor : row[c]);
-    const r         = analyzeTablet(colColors, dir);
+    const r         = analyzeTablet(colColors);
     results.push(r);
     if (r.warning) warnings.push(`Tablet ${c + 1}: ${r.warning}`);
   }
