@@ -249,8 +249,9 @@ function renderPalette() {
 //  for any 2-colour column pattern.
 // ═══════════════════════════════════════════════════════════════════
 
-function analyzeTablet(colColors) {
+function analyzeTablet(colColors, repeating) {
   // colColors: array of colorIndex per pick (0 = empty)
+  // repeating: if true, the tablet must end back at its starting position
 
   // TODO: color = 0 artifact of 2 colors?
   const nonEmpty = colColors.filter(c => c !== 0);
@@ -278,8 +279,6 @@ function analyzeTablet(colColors) {
   // Turn effects based on threading direction
   const fwd = p => (p + 1) % 4;
   const bwd = p => (p + 3) % 4;
-
-  let repeating = false; // TODO: make this a param
 
   function tryTurn(label, idx, pos) {
     const newPos    = label === 'F' ? fwd(pos) : bwd(pos);
@@ -338,13 +337,14 @@ function optimizeResults(results) {
 // ═══════════════════════════════════════════════════════════════════
 
 function generate() {
-  const warnings = [];
-  const results  = [];
-  const bgColor  = palette.length >= 2 ? 2 : 1; // empty cells = Natural (color 2)
+  const warnings  = [];
+  const results   = [];
+  const bgColor   = palette.length >= 2 ? 2 : 1; // empty cells = Natural (color 2)
+  const repeating = document.getElementById('chk-repeating').checked;
 
   for (let c = 0; c < numTablets; c++) {
     const colColors = grid.map(row => row[c] === 0 ? bgColor : row[c]);
-    const r         = analyzeTablet(colColors);
+    const r         = analyzeTablet(colColors, repeating);
     results.push(r);
     if (r.warning) warnings.push(`Tablet ${c + 1}: ${r.warning}`);
   }
