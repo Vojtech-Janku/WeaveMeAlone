@@ -1,0 +1,28 @@
+{
+  "name": "weavemealone",
+  "version": "1.0.0",
+  "description": "A web application for reverse-engineering the tablet weaving sequence from a given final pattern",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vojtech-Janku/WeaveMeAlone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Vojtech-Janku/WeaveMeAlone/issues"
+  },
+  "homepage": "https://github.com/Vojtech-Janku/WeaveMeAlone#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "typescript": "^7.0.2"
+  }
+}
